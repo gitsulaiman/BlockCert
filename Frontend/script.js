@@ -186,38 +186,40 @@ function showToast(message) {
 
 }
 
-
 // =====================================
 // DASHBOARD STATISTICS
 // =====================================
 
 async function updateStats() {
+    const totalIssued = document.getElementById("totalIssued");
+    const totalVerified = document.getElementById("totalVerified");
+    const totalRevoked = document.getElementById("totalRevoked");
+
+    // Show loading state
+    totalIssued.textContent = "Loading...";
+    totalVerified.textContent = "Loading...";
+    totalRevoked.textContent = "Loading...";
 
     try {
-
         const data = await apiRequest("/certificates/stats");
 
-        if (data.success) {
-
-            document.getElementById("totalIssued").textContent =
-                data.stats.totalCertificates;
-
-            document.getElementById("totalVerified").textContent =
-                data.stats.validCertificates;
-
-            document.getElementById("totalRevoked").textContent =
-                data.stats.revokedCertificates;
-
+        if (!data.success || !data.stats) {
+            throw new Error("Invalid dashboard statistics response");
         }
 
-    } catch (error) {
+        // Use the exact field names returned by the backend
+        totalIssued.textContent = data.stats.totalIssued ?? 0;
+        totalVerified.textContent = data.stats.totalVerified ?? 0;
+        totalRevoked.textContent = data.stats.totalRevoked ?? 0;
 
+    } catch (error) {
         console.error("Dashboard Statistics Error:", error);
 
+        totalIssued.textContent = "—";
+        totalVerified.textContent = "—";
+        totalRevoked.textContent = "—";
     }
-
 }
-
 
 // =====================================
 // RESULT DISPLAY
