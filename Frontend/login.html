@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | Blockchain Certificate Verification</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #F3EEE8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 430px;
+            background: #FFFFFF;
+            padding: 45px 40px;
+            border-radius: 18px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.09);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-icon {
+            width: 65px;
+            height: 65px;
+            background: #17645F;
+            color: white;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin: 0 auto 15px;
+        }
+
+        .logo h2 {
+            color: #252927;
+            font-size: 23px;
+            font-weight: 700;
+        }
+
+        .logo span {
+            color: #17645F;
+        }
+
+        .logo p {
+            color: #777;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .login-heading {
+            margin-bottom: 25px;
+        }
+
+        .login-heading h3 {
+            color: #252927;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .login-heading p {
+            color: #888;
+            font-size: 13px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #252927;
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #ddd;
+            border-radius: 9px;
+            outline: none;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #17645F;
+            box-shadow: 0 0 0 3px rgba(23, 100, 95, 0.1);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            padding-right: 65px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: none;
+            color: #17645F;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #17645F;
+            color: white;
+            border: none;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 8px;
+        }
+
+        .login-btn:hover {
+            background: #104c48;
+            transform: translateY(-2px);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            display: none;
+            padding: 11px;
+            border-radius: 7px;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+        .error {
+            display: block;
+            color: #c0392b;
+            background: #fff0ee;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 11px;
+            color: #999;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #17645F;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            color: #FF6845;
+        }
+
+        @media(max-width: 480px) {
+            .login-container {
+                padding: 35px 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <div class="logo">
+            <div class="logo-icon">🛡️</div>
+
+            <h2>Blockcert</span></h2>
+
+            <p>Blockchain Academic Certificate Verification</p>
+        </div>
+
+        <div class="login-heading">
+            <h3>Admin Login</h3>
+            <p>Sign in to access the administration dashboard.</p>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <form id="loginForm">
+
+            <div class="input-group">
+                <label for="email">Email Address</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Enter your admin email"
+                    required
+                >
+            </div>
+
+            <div class="input-group">
+                <label for="password">Password</label>
+
+                <div class="password-wrapper">
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter your password"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="toggle-password"
+                        id="togglePassword"
+                    >
+                        Show
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="login-btn" id="loginBtn">
+                Login to Dashboard
+            </button>
+
+        </form>
+
+        <a href="index.html" class="back-link">
+            ← Back to Home
+        </a>
+
+        <div class="footer">
+            © 2026 Blockchain Academic Certificate Verification
+        </div>
+
+    </div>
+
+    <script>
+        const loginForm = document.getElementById("loginForm");
+        const passwordInput = document.getElementById("password");
+        const togglePassword = document.getElementById("togglePassword");
+        const message = document.getElementById("message");
+        const loginBtn = document.getElementById("loginBtn");
+
+        // Show / Hide Password
+        togglePassword.addEventListener("click", () => {
+
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                togglePassword.textContent = "Hide";
+            } else {
+                passwordInput.type = "password";
+                togglePassword.textContent = "Show";
+            }
+
+        });
+
+        // Admin Login
+        loginForm.addEventListener("submit", async (e) => {
+
+            e.preventDefault();
+
+            const email = document.getElementById("email").value.trim();
+            const password = passwordInput.value;
+
+            message.className = "message";
+            message.textContent = "";
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = "Authenticating...";
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:5000/api/auth/login",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            email,
+                            password
+                        })
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || "Invalid login credentials");
+                }
+
+                // Store authentication token
+                localStorage.setItem("adminToken", data.token);
+
+                // Redirect to dashboard
+                window.location.href = "index.html";
+
+            } catch (error) {
+
+                message.textContent = error.message;
+                message.className = "message error";
+
+            } finally {
+
+                loginBtn.disabled = false;
+                loginBtn.textContent = "Login to Dashboard";
+
+            }
+
+        });
+    </script>
+
+</body>
+</html>

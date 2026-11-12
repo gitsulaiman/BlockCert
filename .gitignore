@@ -1,0 +1,17 @@
+# Environment files - NEVER upload secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Hardhat generated files
+artifacts/
+cache/
+
+# Logs
+*.log
+
+# VS Code settings
+.vscode/

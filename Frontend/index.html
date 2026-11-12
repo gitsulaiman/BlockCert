@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BlockCert | Academic Verification</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================================= -->
+    <!-- SIDEBAR -->
+    <!-- ================================= -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">B</div>
+
+            <div>
+                <h2>BlockCert</h2>
+                <span>ACADEMIC TRUST</span>
+            </div>
+
+        </div>
+
+
+        <div class="nav-label">MAIN MENU</div>
+
+
+        <nav class="navigation">
+
+            <button class="nav-item active" data-page="dashboard">
+                <span>⌂</span> Dashboard
+            </button>
+
+            <button class="nav-item" data-page="issue">
+                <span>＋</span> Issue Certificate
+            </button>
+
+            <button class="nav-item" data-page="certificates">
+                <span>▤</span> Certificates
+            </button>
+
+            <button class="nav-item" data-page="verify">
+                <span>⌕</span> Verify Certificate
+            </button>
+
+            <button class="nav-item" data-page="revoke">
+                <span>⊗</span> Revoke Certificate
+            </button>
+
+            <button class="nav-item" data-page="qr">
+                <span>▦</span> QR Verification
+            </button>
+
+        </nav>
+
+
+        <!-- SIDEBAR BOTTOM -->
+
+        <div class="sidebar-bottom">
+
+            <div class="network-status">
+
+                <span class="status-dot"></span>
+
+                <div>
+                    <strong>Network Status</strong>
+                    <small>Ethereum Sepolia Testnet</small>
+                </div>
+
+            </div>
+
+
+            <div class="profile">
+
+                <div class="avatar">A</div>
+
+                <div>
+                    <strong>Administrator</strong>
+                    <small>University Admin</small>
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- ================================= -->
+    <!-- MAIN CONTENT -->
+    <!-- ================================= -->
+
+    <main class="main-content">
+
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <button class="menu-btn" id="menuBtn">☰</button>
+
+            <div>
+
+                <span class="breadcrumb">
+                    Workspace / <b id="pageName">Dashboard</b>
+                </span>
+
+                <h2 id="topTitle">Dashboard Overview</h2>
+
+            </div>
+
+
+            <!-- TOP ACTIONS -->
+
+            <div class="top-actions">
+
+                <span class="live-status">
+                    <span class="status-dot"></span>
+                    System Online
+                </span>
+
+                <div class="avatar">A</div>
+
+                <button id="logoutBtn" class="logout-btn">
+                    Logout ↗
+                </button>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- ================================= -->
+        <!-- DASHBOARD -->
+        <!-- ================================= -->
+
+        <section class="page active" id="dashboard">
+
+
+            <div class="welcome-section">
+
+                <div>
+
+                    <span class="eyebrow">
+                        ACADEMIC CREDENTIAL MANAGEMENT
+                    </span>
+
+                    <h1>
+                        Trust, verified.<br>
+                        <span>For a lifetime.</span>
+                    </h1>
+
+                    <p>
+                        Manage, issue and verify academic credentials
+                        securely using blockchain technology.
+                    </p>
+
+                    <button class="primary-btn" data-go="issue">
+                        + Issue New Certificate
+                    </button>
+
+                </div>
+
+
+                <div class="hero-art">
+
+                    <div class="hero-circle"></div>
+
+                    <div class="hero-card">
+
+                        <span>BLOCKCHAIN VERIFIED</span>
+
+                        <div class="hero-seal">✓</div>
+
+                        <h3>
+                            Academic<br>
+                            Credentials
+                        </h3>
+
+                        <small>
+                            SECURE · AUTHENTIC · TRUSTED
+                        </small>
+
+                    </div>
+
+                    <div class="hero-decoration">✳</div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- STATISTICS -->
+
+            <div class="section-heading">
+
+                <div>
+
+                    <span class="eyebrow">YOUR OVERVIEW</span>
+
+                    <h2>Certificate Statistics</h2>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="stats-grid">
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon teal">▤</div>
+
+                    <span>Total Issued</span>
+
+                    <h2 id="totalIssued">0</h2>
+
+                    <small>Certificates issued</small>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon green">✓</div>
+
+                    <span>Verified</span>
+
+                    <h2 id="totalVerified">0</h2>
+
+                    <small>Valid certificates</small>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon coral">⊗</div>
+
+                    <span>Revoked</span>
+
+                    <h2 id="totalRevoked">0</h2>
+
+                    <small>Revoked certificates</small>
+
+                </div>
+
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon ivory">◈</div>
+
+                    <span>Blockchain</span>
+
+                    <h2 class="connected">Sepolia</h2>
+
+                    <small>Ethereum Test Network</small>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- DASHBOARD GRID -->
+
+            <div class="dashboard-grid">
+
+
+                <!-- QUICK ACCESS -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+
+                            <span class="eyebrow">QUICK ACCESS</span>
+
+                            <h3>Manage Certificates</h3>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="quick-actions">
+
+
+                        <button data-go="issue">
+
+                            <span class="quick-icon teal">＋</span>
+
+                            <span>
+                                <strong>Issue Certificate</strong>
+                                <small>Register a new credential</small>
+                            </span>
+
+                            <b>→</b>
+
+                        </button>
+
+
+
+                        <button data-go="verify">
+
+                            <span class="quick-icon green">✓</span>
+
+                            <span>
+                                <strong>Verify Certificate</strong>
+                                <small>Check certificate authenticity</small>
+                            </span>
+
+                            <b>→</b>
+
+                        </button>
+
+
+
+                        <button data-go="revoke">
+
+                            <span class="quick-icon coral">⊗</span>
+
+                            <span>
+                                <strong>Revoke Certificate</strong>
+                                <small>Invalidate an existing credential</small>
+                            </span>
+
+                            <b>→</b>
+
+                        </button>
+
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- BLOCKCHAIN CONNECTION -->
+
+                <div class="panel blockchain-panel">
+
+                    <span class="eyebrow">
+                        NETWORK INFORMATION
+                    </span>
+
+                    <h3>Blockchain Connection</h3>
+
+                    <div class="blockchain-visual">◈</div>
+
+
+                    <div class="connection-line">
+
+                        <span class="status-dot"></span>
+
+                        <strong>Sepolia Testnet</strong>
+
+                    </div>
+
+
+                    <p>Network: Ethereum Sepolia</p>
+
+                    <p>
+                        Contract:
+                        <span class="contract-address">
+                            0x0692185785204D08c9cdA38C294f0E3d34CA7F22
+                        </span>
+                    </p>
+
+                    <small>
+                        Blockchain connection status is displayed
+                        as a project network indicator.
+                    </small>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================= -->
+        <!-- ISSUE CERTIFICATE -->
+        <!-- ================================= -->
+
+        <section class="page" id="issue">
+
+
+            <div class="page-intro">
+
+                <span class="eyebrow">
+                    CERTIFICATE MANAGEMENT
+                </span>
+
+                <h1>Issue a Certificate</h1>
+
+                <p>
+                    Register a new academic credential on the blockchain.
+                </p>
+
+            </div>
+
+
+
+            <div class="form-layout">
+
+
+                <div class="panel form-panel">
+
+                    <h3>Student Information</h3>
+
+                    <p class="form-subtitle">
+                        Enter the certificate details below.
+                    </p>
+
+
+
+                    <form id="issueForm">
+
+
+                        <label>Student Full Name *</label>
+
+                        <input
+                            type="text"
+                            id="studentName"
+                            placeholder="Enter student name"
+                            required
+                        >
+
+
+
+                        <label>Course / Degree *</label>
+
+                        <input
+                            type="text"
+                            id="courseName"
+                            placeholder="e.g. B.Tech Computer Science"
+                            required
+                        >
+
+
+
+                        <label>University Name *</label>
+
+                        <input
+                            type="text"
+                            id="universityName"
+                            placeholder="Enter university name"
+                            required
+                        >
+
+
+
+                        <label>Issue Date *</label>
+
+                        <input
+                            type="date"
+                            id="issueDate"
+                            required
+                        >
+
+
+
+                        <button
+                            type="submit"
+                            class="primary-btn full-btn"
+                            id="issueBtn"
+                        >
+                            Issue Certificate →
+                        </button>
+
+
+                    </form>
+
+
+
+                    <div
+                        id="issueResult"
+                        class="result-box hidden"
+                    ></div>
+
+
+                </div>
+
+
+
+                <!-- INFORMATION PANEL -->
+
+                <div class="info-panel">
+
+                    <div class="info-symbol">◈</div>
+
+                    <h2>
+                        Secured by<br>
+                        Blockchain.
+                    </h2>
+
+                    <p>
+                        Every certificate receives a unique identity
+                        and cryptographic hash, helping protect
+                        academic credentials against unauthorized changes.
+                    </p>
+
+
+                    <div class="info-feature">
+                        ✓ Tamper-resistant records
+                    </div>
+
+                    <div class="info-feature">
+                        ✓ Transparent verification
+                    </div>
+
+                    <div class="info-feature">
+                        ✓ Secure transaction history
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================= -->
+        <!-- CERTIFICATES -->
+        <!-- ================================= -->
+
+        <section class="page" id="certificates">
+
+
+            <div class="page-intro">
+
+                <span class="eyebrow">
+                    RECORD MANAGEMENT
+                </span>
+
+                <h1>Certificate Management</h1>
+
+                <p>
+                    View, search and manage all academic certificates.
+                </p>
+
+            </div>
+
+
+
+            <div class="panel">
+
+
+                <!-- FILTERS -->
+
+                <div class="certificate-filters">
+
+                    <button
+                        class="filter-btn active"
+                        data-status="ALL"
+                    >
+                        All Certificates
+                    </button>
+
+
+                    <button
+                        class="filter-btn"
+                        data-status="VALID"
+                    >
+                        Valid Certificates
+                    </button>
+
+
+                    <button
+                        class="filter-btn"
+                        data-status="REVOKED"
+                    >
+                        Revoked Certificates
+                    </button>
+
+                </div>
+
+
+
+                <!-- SEARCH -->
+
+                <div class="certificate-search">
+
+                    <input
+                        type="text"
+                        id="certificateSearch"
+                        placeholder="Search by Certificate ID or Student Name..."
+                    >
+
+                </div>
+
+
+
+                <!-- TABLE -->
+
+                <div class="table-container">
+
+                    <table class="certificate-table">
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Certificate ID</th>
+
+                                <th>Student Name</th>
+
+                                <th>Course</th>
+
+                                <th>Issue Date</th>
+
+                                <th>Status</th>
+
+                                <th>Action</th>
+
+                            </tr>
+
+                        </thead>
+
+
+
+                        <tbody id="certificateTableBody">
+
+                            <tr>
+                                <td colspan="6">
+                                    Loading certificates...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+
+                    </table>
+
+                </div>
+
+
+
+                <!-- DETAILS -->
+
+                <div id="certificateDetails"></div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================= -->
+        <!-- VERIFY CERTIFICATE -->
+        <!-- ================================= -->
+
+        <section class="page" id="verify">
+
+
+            <div class="page-intro">
+
+                <span class="eyebrow">
+                    AUTHENTICITY CHECK
+                </span>
+
+                <h1>Verify a Certificate</h1>
+
+                <p>
+                    Confirm whether an academic certificate is authentic and valid.
+                </p>
+
+            </div>
+
+
+
+            <div class="panel verification-panel">
+
+
+                <div class="verify-icon">✓</div>
+
+                <h2>Certificate Verification</h2>
+
+                <p>
+                    Enter the unique certificate identification number.
+                </p>
+
+
+
+                <form id="verifyForm">
+
+                    <input
+                        type="text"
+                        id="verifyId"
+                        placeholder="Enter Certificate ID"
+                        required
+                    >
+
+
+                    <button class="primary-btn full-btn" type="submit">
+                        Verify Authenticity →
+                    </button>
+
+                </form>
+
+
+
+                <div id="verifyResult"></div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================= -->
+        <!-- REVOKE CERTIFICATE -->
+        <!-- ================================= -->
+
+        <section class="page" id="revoke">
+
+
+            <div class="page-intro">
+
+                <span class="eyebrow">
+                    SECURITY MANAGEMENT
+                </span>
+
+                <h1>Revoke Certificate</h1>
+
+                <p>
+                    Revoke a certificate that should no longer be considered valid.
+                </p>
+
+            </div>
+
+
+
+            <div class="panel revoke-panel">
+
+
+                <div class="revoke-icon">!</div>
+
+                <h2>Certificate Revocation</h2>
+
+
+                <p>
+                    Revocation is recorded on the blockchain.
+                    This action should only be performed by an authorized issuer.
+                </p>
+
+
+
+                <label>Certificate ID</label>
+
+
+                <input
+                    type="text"
+                    id="revokeId"
+                    placeholder="Enter certificate ID"
+                >
+
+
+
+                <button
+                    class="danger-btn full-btn"
+                    id="revokeBtn"
+                    type="button"
+                >
+                    Revoke Certificate
+                </button>
+
+
+
+                <div id="revokeResult"></div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================= -->
+        <!-- QR VERIFICATION -->
+        <!-- ================================= -->
+
+        <section class="page" id="qr">
+
+
+            <div class="page-intro">
+
+                <span class="eyebrow">
+                    SMART VERIFICATION
+                </span>
+
+                <h1>QR Verification</h1>
+
+                <p>
+                    Generate a QR code for convenient certificate verification.
+                </p>
+
+            </div>
+
+
+
+            <div class="panel qr-panel">
+
+
+                <h2>Generate Certificate QR</h2>
+
+
+
+                <label>Certificate ID</label>
+
+
+                <input
+                    type="text"
+                    id="qrId"
+                    placeholder="Enter certificate ID"
+                >
+
+
+
+                <button
+                    class="primary-btn full-btn"
+                    id="generateQR"
+                    type="button"
+                >
+                    Generate QR Code
+                </button>
+
+
+
+                <div id="qrOutput"></div>
+
+
+
+                <p class="qr-note">
+                    The QR code opens the verification page with the certificate ID.
+                </p>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================================= -->
+        <!-- FOOTER -->
+        <!-- ================================= -->
+
+        <footer>
+
+            <span>
+                © 2026 BlockCert Academic Verification
+            </span>
+
+            <span>
+                Powered by Blockchain Technology ◈
+            </span>
+
+        </footer>
+
+
+    </main>
+
+</div>
+
+
+
+<!-- TOAST NOTIFICATION -->
+
+<div id="toast" class="toast"></div>
+
+
+
+<!-- MAIN JAVASCRIPT -->
+
+<script src="script.js"></script>
+
+
+</body>
+
+</html>
