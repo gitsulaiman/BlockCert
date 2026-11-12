@@ -2,7 +2,7 @@
 // CONFIGURATION & AUTHENTICATION
 // =====================================
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://blockcert-backend-l26i.onrender.com/api";
 
 const adminToken = localStorage.getItem("adminToken");
 
