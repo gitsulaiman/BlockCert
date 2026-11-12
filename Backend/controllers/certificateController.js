@@ -2,9 +2,14 @@ const contract = require("../blockchain/contract");
 const Certificate = require("../models/Certificate");
 const crypto = require("crypto");
 
-// Issue a new certificate
+// ==========================================
+// 1. ISSUE A NEW CERTIFICATE
+// ==========================================
+
 const issueCertificate = async (req, res) => {
     try {
+        console.log("\n========== CERTIFICATE ISSUANCE STARTED ==========");
+
         const {
             studentName,
             courseName,
@@ -12,6 +17,9 @@ const issueCertificate = async (req, res) => {
             issueDate
         } = req.body;
 
+        console.log("STEP 1: Certificate request received");
+
+        // Validate required fields
         if (!studentName || !courseName || !universityName || !issueDate) {
             return res.status(400).json({
                 success: false,
@@ -19,6 +27,7 @@ const issueCertificate = async (req, res) => {
             });
         }
 
+        // Validate date
         const parsedDate = new Date(issueDate);
 
         if (Number.isNaN(parsedDate.getTime())) {
@@ -28,12 +37,14 @@ const issueCertificate = async (req, res) => {
             });
         }
 
+        // Generate unique certificate ID
         const certificateId =
             "CERT-" +
             Date.now() +
             "-" +
             crypto.randomBytes(3).toString("hex").toUpperCase();
 
+        // Prepare certificate data
         const certificateData = JSON.stringify({
             certificateId,
             studentName,
@@ -42,17 +53,34 @@ const issueCertificate = async (req, res) => {
             issueDate: parsedDate.toISOString()
         });
 
+        // Generate SHA-256 hash
         const certificateHash = crypto
             .createHash("sha256")
             .update(certificateData)
             .digest("hex");
 
         const blockchainHash = "0x" + certificateHash;
+
+        console.log("STEP 2: Certificate ID generated:", certificateId);
+        console.log("STEP 3: Certificate hash generated");
+        console.log("STEP 4: Sending transaction to blockchain...");
+
+        // Send transaction to blockchain
         const transaction = await contract.issueCertificate(
             certificateId,
             blockchainHash
         );
+
+        console.log("STEP 5: Transaction submitted:", transaction.hash);
+        console.log("STEP 6: Waiting for blockchain confirmation...");
+
+        // Wait for transaction confirmation
         const receipt = await transaction.wait();
+
+        console.log("STEP 7: Transaction confirmed:", receipt.hash);
+
+        // Save certificate in MongoDB
+        console.log("STEP 8: Saving certificate to MongoDB...");
 
         const certificate = await Certificate.create({
             certificateId,
@@ -65,13 +93,20 @@ const issueCertificate = async (req, res) => {
             status: "VALID"
         });
 
+        console.log("STEP 9: Certificate saved successfully");
+        console.log("========== CERTIFICATE ISSUANCE COMPLETED ==========\n");
+
         return res.status(201).json({
             success: true,
             message: "Certificate issued successfully on blockchain!",
             certificate
         });
+
     } catch (error) {
-        console.error("Certificate Issuing Error:", error);
+        console.error("\n========== CERTIFICATE ISSUANCE ERROR ==========");
+        console.error(error);
+        console.error("Error message:", error.message);
+        console.error("================================================\n");
 
         return res.status(500).json({
             success: false,
@@ -81,7 +116,11 @@ const issueCertificate = async (req, res) => {
     }
 };
 
-// Get certificate details
+
+// ==========================================
+// 2. GET CERTIFICATE BY ID
+// ==========================================
+
 const getCertificate = async (req, res) => {
     try {
         const certificate = await Certificate.findOne({
@@ -99,85 +138,87 @@ const getCertificate = async (req, res) => {
             success: true,
             certificate
         });
+
     } catch (error) {
+        console.error("Get Certificate Error:", error);
+
         return res.status(500).json({
             success: false,
-            message: error.message
+            message: "Error fetching certificate",
+            error: error.message
         });
     }
 };
 
-// Verify certificate using blockchain and MongoDB
+
+// ==========================================
+// 3. VERIFY CERTIFICATE
+// ==========================================
+
 const verifyCertificate = async (req, res) => {
     try {
+        const { id } = req.params;
+
+        console.log("Verifying certificate:", id);
+
+        // Find certificate in MongoDB
         const certificate = await Certificate.findOne({
-            certificateId: req.params.id
+            certificateId: id
         });
 
         if (!certificate) {
             return res.status(404).json({
                 success: false,
-                status: "NOT_FOUND",
-                message: "Certificate does not exist"
+                message: "Certificate not found. It may be invalid or fake."
             });
         }
 
         // Verify certificate on blockchain
-        const blockchainResult = await contract.verifyCertificate(
-            req.params.id
-        );
-
         const [
             exists,
             blockchainHash,
             issuer,
-            issueDate,
+            blockchainIssueDate,
             revoked
-        ] = blockchainResult;
+        ] = await contract.verifyCertificate(id);
 
-        // Check blockchain existence
         if (!exists) {
-            return res.status(200).json({
+            return res.status(404).json({
                 success: false,
-                status: "INVALID",
-                message: "Certificate not found on blockchain"
+                message: "Certificate does not exist on blockchain."
             });
         }
 
-        // Compare MongoDB hash with blockchain hash
+        // Compare hashes
         const storedHash = "0x" + certificate.certificateHash;
 
-        if (blockchainHash.toLowerCase() !== storedHash.toLowerCase()) {
-            return res.status(200).json({
+        if (storedHash.toLowerCase() !== blockchainHash.toLowerCase()) {
+            return res.status(400).json({
                 success: false,
-                status: "INVALID",
-                message: "Certificate hash mismatch. Data may have been modified."
+                message: "Certificate data has been modified. Verification failed."
             });
         }
 
         // Check revocation status
-        if (revoked) {
+        if (revoked || certificate.status === "REVOKED") {
             return res.status(200).json({
                 success: true,
+                verified: false,
                 status: "REVOKED",
-                message: "Certificate has been revoked on blockchain"
+                message: "This certificate has been revoked.",
+                certificate
             });
         }
 
         return res.status(200).json({
             success: true,
+            verified: true,
             status: "VALID",
-            message: "Certificate successfully verified on blockchain",
-            certificate: {
-                certificateId: certificate.certificateId,
-                studentName: certificate.studentName,
-                courseName: certificate.courseName,
-                universityName: certificate.universityName,
-                issueDate: certificate.issueDate,
-                certificateHash: certificate.certificateHash,
-                transactionHash: certificate.transactionHash,
+            message: "Certificate verified successfully on blockchain!",
+            certificate,
+            blockchain: {
                 issuer,
-                blockchainIssueDate: issueDate.toString()
+                issueDate: blockchainIssueDate.toString()
             }
         });
 
@@ -191,11 +232,16 @@ const verifyCertificate = async (req, res) => {
         });
     }
 };
+
+
+// ==========================================
+// 4. REVOKE CERTIFICATE
+// ==========================================
+
 const revokeCertificate = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Find certificate in MongoDB
         const certificate = await Certificate.findOne({
             certificateId: id
         });
@@ -207,7 +253,6 @@ const revokeCertificate = async (req, res) => {
             });
         }
 
-        // Check whether already revoked
         if (certificate.status === "REVOKED") {
             return res.status(400).json({
                 success: false,
@@ -215,13 +260,12 @@ const revokeCertificate = async (req, res) => {
             });
         }
 
-        // Revoke certificate on blockchain
+        // Revoke on blockchain
         const transaction = await contract.revokeCertificate(id);
 
-        // Wait for blockchain confirmation
         const receipt = await transaction.wait();
 
-        // Update MongoDB only after confirmation
+        // Update MongoDB
         certificate.status = "REVOKED";
         certificate.revocationTransactionHash = receipt.hash;
 
@@ -229,8 +273,7 @@ const revokeCertificate = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Certificate revoked successfully on blockchain!",
-            transactionHash: receipt.hash,
+            message: "Certificate revoked successfully",
             certificate
         });
 
@@ -244,27 +287,22 @@ const revokeCertificate = async (req, res) => {
         });
     }
 };
-// Get all certificates or filter by status
+
+
+// ==========================================
+// 5. GET ALL CERTIFICATES
+// ==========================================
+
 const getAllCertificates = async (req, res) => {
     try {
         const { status } = req.query;
 
-        // Validate status if provided
-        if (status && !["VALID", "REVOKED"].includes(status.toUpperCase())) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid status. Use VALID or REVOKED."
-            });
+        let filter = {};
+
+        if (status === "VALID" || status === "REVOKED") {
+            filter.status = status;
         }
 
-        // Build database filter
-        const filter = {};
-
-        if (status) {
-            filter.status = status.toUpperCase();
-        }
-
-        // Fetch certificates, newest first
         const certificates = await Certificate.find(filter)
             .sort({ createdAt: -1 });
 
@@ -279,27 +317,35 @@ const getAllCertificates = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: "Failed to fetch certificates",
+            message: "Error fetching certificates",
             error: error.message
         });
     }
 };
-// Get dashboard statistics from MongoDB
+
+
+// ==========================================
+// 6. GET DASHBOARD STATISTICS
+// ==========================================
+
 const getDashboardStats = async (req, res) => {
     try {
-        const [totalCertificates, validCertificates, revokedCertificates] =
-            await Promise.all([
-                Certificate.countDocuments(),
-                Certificate.countDocuments({ status: "VALID" }),
-                Certificate.countDocuments({ status: "REVOKED" })
-            ]);
+        const totalIssued = await Certificate.countDocuments();
+
+        const totalVerified = await Certificate.countDocuments({
+            status: "VALID"
+        });
+
+        const totalRevoked = await Certificate.countDocuments({
+            status: "REVOKED"
+        });
 
         return res.status(200).json({
             success: true,
             stats: {
-                totalCertificates,
-                validCertificates,
-                revokedCertificates
+                totalIssued,
+                totalVerified,
+                totalRevoked
             }
         });
 
@@ -308,17 +354,22 @@ const getDashboardStats = async (req, res) => {
 
         return res.status(500).json({
             success: false,
-            message: "Failed to fetch dashboard statistics",
+            message: "Error fetching dashboard statistics",
             error: error.message
         });
     }
 };
 
+
+// ==========================================
+// EXPORT ALL CONTROLLERS
+// ==========================================
+
 module.exports = {
     issueCertificate,
     getCertificate,
-    getAllCertificates,
     verifyCertificate,
     revokeCertificate,
+    getAllCertificates,
     getDashboardStats
 };
